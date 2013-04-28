@@ -20,7 +20,7 @@ import org.osgi.framework.*;
  * @author Lionel Ferreira & Michael Tarantino
  */
 public class IrcAccRegWizzActivator
-    implements BundleActivator
+    extends AbstractServiceDependentActivator
 {
     private static Logger logger = Logger.getLogger(
         IrcAccRegWizzActivator.class.getName());
@@ -37,20 +37,14 @@ public class IrcAccRegWizzActivator
 
     /**
      * Starts this bundle.
-     * @param bc the currently valid <tt>BundleContext</tt>.
+     * @param o a reference to the dependant service - the <tt>UIService</tt>
      */
-    public void start(BundleContext bc)
+    public void start(Object o)
     {
         if (logger.isInfoEnabled())
             logger.info("Loading irc account wizard.");
 
-        bundleContext = bc;
-
-        ServiceReference uiServiceRef = bundleContext
-            .getServiceReference(UIService.class.getName());
-
-        UIService uiService
-            = (UIService) bundleContext.getService(uiServiceRef);
+        UIService uiService = (UIService) o;
 
         WizardContainer wizardContainer
             = uiService.getAccountRegWizardContainer();
@@ -85,6 +79,16 @@ public class IrcAccRegWizzActivator
     }
 
     /**
+     * The dependent class. We are waiting for the ui service.
+     * @return the ui service class.
+     */
+    @Override
+    public Class<?> getDependentServiceClass()
+    {
+        return UIService.class;
+    }
+
+    /**
      * Returns the <tt>ProtocolProviderFactory</tt> for the IRC protocol.
      * @return the <tt>ProtocolProviderFactory</tt> for the IRC protocol
      */
@@ -107,6 +111,16 @@ public class IrcAccRegWizzActivator
         }
 
         return (ProtocolProviderFactory) bundleContext.getService(serRefs[0]);
+    }
+
+    /**
+     * Sets the bundleContext
+     *
+     * @param bc the BundleContext
+     */
+    public void setBundleContext(BundleContext bc)
+    {
+        bundleContext = bc;
     }
 
     /**
