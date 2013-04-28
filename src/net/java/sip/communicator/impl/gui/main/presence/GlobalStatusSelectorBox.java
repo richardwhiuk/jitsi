@@ -172,8 +172,8 @@ public class GlobalStatusSelectorBox
         if (isHidden)
             return;
 
-        OperationSetPersistentPresence presenceOpSet
-            = (OperationSetPersistentPresence)
+        OperationSetPresence presenceOpSet
+            = (OperationSetPresence)
                 protocolProvider.getOperationSet(OperationSetPresence.class);
         StatusSelectorMenu statusSelectorMenu
             = (presenceOpSet != null)
