@@ -913,6 +913,7 @@
         bundle-resource-manager,bundle-resources-defaultpack,
         bundle-protocol,bundle-protocol-media,bundle-icq,
         bundle-icq-slick,bundle-mock,bundle-smacklib,bundle-jmdnslib,
+        bundle-irc,bundle-plugin-ircaccregwizz,
         bundle-jabber,bundle-jabber-slick,bundle-swing-ui,bundle-ui-service,
         bundle-jnalib,
         bundle-msn,bundle-msn-slick,bundle-yahoo,bundle-yahoo-slick,
