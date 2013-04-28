@@ -35,22 +35,24 @@ public class IrcAccRegWizzActivator
      */
     public static UIService uiService;
 
+    private static WizardContainer wizardContainer;
+
+    private static IrcAccountRegistrationWizard ircWizard;
+
     /**
      * Starts this bundle.
      * @param o a reference to the dependant service - the <tt>UIService</tt>
      */
-    public void start(Object o)
+    public void start(Object dependentService)
     {
+	uiService = (UIService)dependentService;
+
         if (logger.isInfoEnabled())
             logger.info("Loading irc account wizard.");
 
-        UIService uiService = (UIService) o;
+	wizardContainer = uiService.getAccountRegWizardContainer();
 
-        WizardContainer wizardContainer
-            = uiService.getAccountRegWizardContainer();
-
-        IrcAccountRegistrationWizard ircWizard
-            = new IrcAccountRegistrationWizard(wizardContainer);
+	ircWizard = new IrcAccountRegistrationWizard(wizardContainer);
 
         Hashtable<String, String> containerFilter
             = new Hashtable<String, String>();
@@ -75,6 +77,7 @@ public class IrcAccRegWizzActivator
      * @param context The execution context of the bundle being stopped.
      */
     public void stop(BundleContext context)
+       throws Exception
     {
     }
 
@@ -98,7 +101,7 @@ public class IrcAccRegWizzActivator
 
         String osgiFilter = "("
             + ProtocolProviderFactory.PROTOCOL
-            + "=" + "IRC" + ")";
+            + "=" + ProtocolNames.IRC + ")";
 
         try
         {
@@ -107,7 +110,7 @@ public class IrcAccRegWizzActivator
         }
         catch (InvalidSyntaxException ex)
         {
-            logger.error(ex);
+            logger.error("IrcAccRegWizzActivator : " + ex);
         }
 
         return (ProtocolProviderFactory) bundleContext.getService(serRefs[0]);
@@ -142,4 +145,5 @@ public class IrcAccRegWizzActivator
     {
         return uiService;
     }
+
 }

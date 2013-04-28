@@ -7,21 +7,19 @@ package net.java.sip.communicator.impl.gui.main.presence;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.*;
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.text.html.*;
 
 import net.java.sip.communicator.impl.gui.*;
+import net.java.sip.communicator.impl.gui.customcontrols.*;
+import net.java.sip.communicator.impl.gui.main.*;
+import net.java.sip.communicator.impl.gui.main.login.*;
+import net.java.sip.communicator.impl.gui.main.presence.message.*;
 import net.java.sip.communicator.impl.gui.utils.*;
-import net.java.sip.communicator.plugin.desktoputil.*;
-import net.java.sip.communicator.plugin.desktoputil.presence.*;
 import net.java.sip.communicator.service.protocol.*;
-import net.java.sip.communicator.util.Logger;
-import net.java.sip.communicator.util.account.*;
-
-import org.jitsi.util.*;
+import net.java.sip.communicator.util.*;
+import net.java.sip.communicator.util.swing.*;
 
 /**
  * The <tt>StatusSelectorBox</tt> is a <tt>SIPCommMenu</tt> that contains
@@ -34,8 +32,7 @@ import org.jitsi.util.*;
  */
 public class PresenceStatusMenu
     extends StatusSelectorMenu
-    implements ActionListener,
-               PropertyChangeListener
+    implements ActionListener
 {
     /**
      * Serial version UID.
@@ -50,18 +47,11 @@ public class PresenceStatusMenu
 
     private PresenceStatus onlineStatus;
 
+    private PresenceStatus lastSelectedStatus;
+
     private OperationSetPresence presence;
 
-    /**
-     * The area will display the account display name and its status message
-     * if any.
-     */
-    private JEditorPane titleArea;
-
-    /**
-     * The status message menu.
-     */
-    private StatusMessageMenu statusMessageMenu;
+    private JLabel titleLabel;
 
     /**
      * Take care for global status items, that only one is selected.
@@ -81,11 +71,17 @@ public class PresenceStatusMenu
         super(protocolProvider.getAccountID().getDisplayName(),
             ImageLoader.getAccountStatusImage(protocolProvider),
             protocolProvider);
+        
+        logger.fatal("Protocol provider: " + protocolProvider);
 
         this.presence
                 = protocolProvider.getOperationSet(OperationSetPresence.class);
+        
+        logger.fatal("Presence: " + this.presence);
 
         this.statusIterator = this.presence.getSupportedStatusSet();
+        
+        logger.fatal("SI: " + this.statusIterator);
 
         String tooltip =
             "<html><b>" + protocolProvider.getAccountID().getDisplayName()
@@ -93,21 +89,12 @@ public class PresenceStatusMenu
 
         this.setToolTipText(tooltip);
 
-        titleArea = new JEditorPane();
-        titleArea.setContentType("text/html");
-        Constants.loadSimpleStyle(((HTMLDocument)titleArea.getDocument())
-                                        .getStyleSheet(),
-                                   titleArea.getFont());
-        titleArea.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-        titleArea.setOpaque(false);
-        titleArea.setEditable(false);
-        titleArea.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        titleLabel = new JLabel(protocolProvider.getAccountID().getDisplayName());
 
-        statusMessageMenu = new StatusMessageMenu(protocolProvider, true);
-        statusMessageMenu.addPropertyChangeListener(this);
-        updateTitleArea();
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD));
 
-        this.add(titleArea);
+        this.add(titleLabel);
         this.addSeparator();
 
         while (statusIterator.hasNext())
@@ -135,7 +122,7 @@ public class PresenceStatusMenu
 
         this.addSeparator();
 
-        this.add((JMenu)statusMessageMenu.getMenu());
+        this.add(new StatusMessageMenu(protocolProvider));
 
         this.setSelectedStatus(offlineStatus);
         updateStatus(offlineStatus);
@@ -202,7 +189,7 @@ public class PresenceStatusMenu
     public void updateStatus(PresenceStatus presenceStatus)
     {
         OperationSetPresence presence
-            = AccountStatusUtils.getProtocolPresenceOpSet(protocolProvider);
+            = MainFrame.getProtocolPresenceOpSet(protocolProvider);
 
         if (logger.isTraceEnabled())
             logger.trace("Update status for provider: "
@@ -224,37 +211,10 @@ public class PresenceStatusMenu
 
             if(item instanceof JCheckBoxMenuItem)
             {
-                if(item.getName().equals(presenceStatus.getStatusName()))
-                {
+                if(item.getText().equals(presenceStatus.getStatusName()))
                     item.setSelected(true);
-                    //item.setText("<html><b>" + item.getName() + "</b></html>");
-                }
-                else
-                {
-                    item.setText(item.getName());
-                }
             }
         }
-    }
-
-    /**
-     * Updates the current title area with the account display name
-     * and its status.
-     */
-    private void updateTitleArea()
-    {
-        StringBuilder txt = new StringBuilder();
-        txt.append("<html>").append("<b>");
-        txt.append(protocolProvider.getAccountID().getDisplayName())
-            .append("</b>");
-
-        String statusMessage = statusMessageMenu.getCurrentMessage();
-        if(!StringUtils.isNullOrEmpty(statusMessage))
-        {
-            txt.append("<br/>").append(statusMessage);
-        }
-        txt.append("</html>");
-        titleArea.setText(txt.toString());
     }
 
     /**
@@ -300,6 +260,16 @@ public class PresenceStatusMenu
     }
 
     /**
+     * Returns the status that is currently selected.
+     *
+     * @return the status that is currently selected
+     */
+    public PresenceStatus getLastSelectedStatus()
+    {
+        return lastSelectedStatus;
+    }
+
+    /**
      * Loads resources for this component.
      */
     @Override
@@ -308,18 +278,5 @@ public class PresenceStatusMenu
         super.loadSkin();
 
         this.setIcon(ImageLoader.getAccountStatusImage(protocolProvider));
-    }
-
-    /**
-     * Listens for change in the status message coming from StatusMessageMenu.
-     * @param evt the event.
-     */
-    public void propertyChange(PropertyChangeEvent evt)
-    {
-        if(evt.getPropertyName()
-            .equals(StatusMessageMenu.STATUS_MESSAGE_UPDATED_PROP))
-        {
-            updateTitleArea();
-        }
     }
 }

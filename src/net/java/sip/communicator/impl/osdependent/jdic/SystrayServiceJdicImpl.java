@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
 import java.util.*;
-import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -127,12 +126,6 @@ public class SystrayServiceJdicImpl
      */
     private final SystrayPopupMessageListener popupMessageListener
         = new SystrayPopupMessageListenerImpl();
-
-    /**
-     * List of listeners from early received calls to addPopupMessageListener.
-     * Calls to addPopupMessageListener before the UIService is registered.
-     */
-    private List<SystrayPopupMessageListener> earlyAddedListeners = null;
 
     /**
      * Initializes a new <tt>SystrayServiceJdicImpl</tt> instance.
@@ -439,8 +432,6 @@ public class SystrayServiceJdicImpl
 
     /**
      * Implements the <tt>SystrayService.addPopupMessageListener</tt> method.
-     * If <tt>activePopupHandler</tt> is still not available record the listener
-     * so we can add him later.
      *
      * @param listener the listener to add
      */
@@ -448,14 +439,6 @@ public class SystrayServiceJdicImpl
     {
         if (activePopupHandler != null)
             activePopupHandler.addPopupMessageListener(listener);
-        else
-        {
-            if(earlyAddedListeners == null)
-                earlyAddedListeners =
-                    new ArrayList<SystrayPopupMessageListener>();
-
-            earlyAddedListeners.add(listener);
-        }
     }
 
     /**
@@ -607,17 +590,6 @@ public class SystrayServiceJdicImpl
                         + newHandler);
         }
         activePopupHandler = newHandler;
-        // if we have received calls to addPopupMessageListener before
-        // the UIService is registered we should add those listeners
-        if(earlyAddedListeners != null)
-        {
-            for(SystrayPopupMessageListener l : earlyAddedListeners)
-                activePopupHandler.addPopupMessageListener(l);
-
-            earlyAddedListeners.clear();
-            earlyAddedListeners = null;
-        }
-
         return oldHandler;
     }
 
@@ -676,8 +648,18 @@ public class SystrayServiceJdicImpl
             Object o = evt.getTag();
 
             if (o instanceof Contact)
-                OsDependentActivator.getUIService().
-                    getChat((Contact) o).setChatVisible(true);
+            {
+                Contact contact = (Contact) o;
+                logger.fatal("Contact: " + contact);
+                UIService uis = OsDependentActivator.getUIService();
+                logger.fatal("UIS: " + uis);
+                Chat chat = uis.getChat(contact);
+                logger.fatal("Chat: " + chat);
+                if(chat != null)
+                {
+                    chat.setChatVisible(true);
+                }
+            }
         }
     }
 

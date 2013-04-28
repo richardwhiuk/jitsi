@@ -54,8 +54,8 @@ public class IrcStatusEnum
     /**
      * Initialize the list of supported status states.
      */
-    private static final List<IrcStatusEnum> supportedStatusSet
-        = new LinkedList<IrcStatusEnum>();
+    private static final List<PresenceStatus> supportedStatusSet
+        = new LinkedList<PresenceStatus>();
     static
     {
         supportedStatusSet.add(OFFLINE);
@@ -83,7 +83,7 @@ public class IrcStatusEnum
      * @return an <tt>Iterator</tt> over all status instances supported by the
      * IRC provider.
      */
-    static Iterator<IrcStatusEnum> supportedStatusSet()
+    static Iterator<PresenceStatus> supportedStatusSet()
     {
         return supportedStatusSet.iterator();
     }

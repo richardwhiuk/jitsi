@@ -6,10 +6,6 @@
  */
 package net.java.sip.communicator.service.protocol;
 
-import java.util.*;
-
-import net.java.sip.communicator.service.protocol.event.*;
-
 /**
  * This class represents the notion of a Contact or Buddy, that is widely used
  * in instant messaging today. From a protocol point of view, a contact is
@@ -119,36 +115,4 @@ public interface Contact
      */
     public String getStatusMessage();
 
-    /**
-     * Indicates if this contact supports resources.
-     *
-     * @return <tt>true</tt> if this contact supports resources, <tt>false</tt>
-     * otherwise
-     */
-    public boolean supportResources();
-
-    /**
-     * Returns a collection of resources supported by this contact or null
-     * if it doesn't support resources.
-     *
-     * @return a collection of resources supported by this contact or null
-     * if it doesn't support resources
-     */
-    public Collection<ContactResource> getResources();
-
-    /**
-     * Adds the given <tt>ContactResourceListener</tt> to listen for events
-     * related to contact resources changes.
-     * 
-     * @param l the <tt>ContactResourceListener</tt> to add
-     */
-    public void addResourceListener(ContactResourceListener l);
-
-    /**
-     * Removes the given <tt>ContactResourceListener</tt> listening for events
-     * related to contact resources changes.
-     * 
-     * @param l the <tt>ContactResourceListener</tt> to rmove
-     */
-    public void removeResourceListener(ContactResourceListener l);
 }

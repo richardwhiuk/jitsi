@@ -7,8 +7,10 @@
 package net.java.sip.communicator.impl.protocol.irc;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.Logger;
 
 /**
  * The IRC implementation of a sip-communicator AccountID.
@@ -19,6 +21,10 @@ import net.java.sip.communicator.service.protocol.*;
 public class IrcAccountID
     extends AccountID
 {
+
+    private static final Logger logger
+        = Logger.getLogger(IrcAccountID.class);
+    
     /**
      * Creates an account id from the specified id and account properties.
      *
@@ -44,9 +50,6 @@ public class IrcAccountID
      */
     private static String getServiceName(Map<String, String> accountProperties)
     {
-        String serviceName
-            = accountProperties.get(ProtocolProviderFactory.SERVER_ADDRESS);
-
-        return (serviceName == null) ? ProtocolNames.IRC : serviceName;
+        return accountProperties.get(ProtocolProviderFactory.SERVER_ADDRESS);
     }
 }

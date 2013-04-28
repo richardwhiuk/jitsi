@@ -16,12 +16,11 @@ import net.java.sip.communicator.impl.gui.*;
 import net.java.sip.communicator.impl.gui.lookandfeel.*;
 import net.java.sip.communicator.impl.gui.main.*;
 import net.java.sip.communicator.impl.gui.utils.*;
-import net.java.sip.communicator.plugin.desktoputil.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.globalstatus.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.util.*;
-import net.java.sip.communicator.util.account.*;
+import net.java.sip.communicator.util.swing.*;
 
 /**
  * The <tt>GlobalStatusSelectorBox</tt> is a global status selector box, which
@@ -67,6 +66,12 @@ public class GlobalStatusSelectorBox
      */
     private Image arrowImage
         = ImageLoader.getImage(ImageLoader.DOWN_ARROW_ICON);
+
+    /**
+     * The object used for logging.
+     */
+    private final Logger logger
+        = Logger.getLogger(GlobalStatusSelectorBox.class);
 
     /**
      * The main application window.
@@ -347,10 +352,13 @@ public class GlobalStatusSelectorBox
                 presenceStatus = presenceStatusMenu.getOfflineStatus();
             else
             {
-                presenceStatus
-                    = AccountStatusUtils.getLastPresenceStatus(protocolProvider);
+                presenceStatus = presenceStatusMenu.getLastSelectedStatus();
                 if (presenceStatus == null)
-                    presenceStatus = presenceStatusMenu.getOnlineStatus();
+                {
+                    presenceStatus = getLastPresenceStatus(protocolProvider);
+                    if (presenceStatus == null)
+                        presenceStatus = presenceStatusMenu.getOnlineStatus();
+                }
             }
 
             presenceStatusMenu.updateStatus(presenceStatus);
@@ -424,7 +432,7 @@ public class GlobalStatusSelectorBox
             }
 
             int presenceStatus
-                = (presence == null)
+                = (presence == null || presence.getPresenceStatus() == null)
                     ? PresenceStatus.AVAILABLE_THRESHOLD
                     : presence.getPresenceStatus().getStatus();
 
@@ -542,6 +550,34 @@ public class GlobalStatusSelectorBox
     }
 
     /**
+     * Returns the last status that was stored in the configuration xml for the
+     * given protocol provider.
+     * 
+     * @param protocolProvider the protocol provider
+     * @return the last status that was stored in the configuration xml for the
+     *         given protocol provider
+     */
+    public PresenceStatus getLastPresenceStatus(
+        ProtocolProviderService protocolProvider)
+    {
+        return GuiActivator.getGlobalStatusService()
+            .getLastPresenceStatus(protocolProvider);
+    }
+
+    /**
+     * Returns the last contact status saved in the configuration.
+     * 
+     * @param protocolProvider the protocol provider to which the status
+     *            corresponds
+     * @return the last contact status saved in the configuration.
+     */
+    public String getLastStatusString(ProtocolProviderService protocolProvider)
+    {
+        return GuiActivator.getGlobalStatusService()
+            .getLastStatusString(protocolProvider);
+    }
+
+    /**
      * Overwrites the <tt>paintComponent(Graphics g)</tt> method in order to
      * provide a new look and the mouse moves over this component.
      * @param g the <tt>Graphics</tt> object used for painting
@@ -584,7 +620,7 @@ public class GlobalStatusSelectorBox
         textWidth
             = (text == null)
                 ? 0
-                : ComponentUtils.getStringWidth(this, text);
+                : GuiUtils.getStringWidth(this, text);
 
         this.setPreferredSize(new Dimension(
             textWidth + 2*IMAGE_INDENT + arrowImage.getWidth(null) + 5, 20));

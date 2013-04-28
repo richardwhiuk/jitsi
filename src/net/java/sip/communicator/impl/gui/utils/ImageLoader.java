@@ -16,10 +16,10 @@ import javax.imageio.*;
 import javax.swing.*;
 
 import net.java.sip.communicator.impl.gui.*;
-import net.java.sip.communicator.plugin.desktoputil.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.resources.*;
 import net.java.sip.communicator.util.*;
+import net.java.sip.communicator.util.swing.*;
 
 /**
  * Stores and loads images used throughout this UI implementation.
@@ -154,12 +154,6 @@ public class ImageLoader
      */
     public static final ImageID DOWN_ARROW_ICON
         = new ImageID("service.gui.icons.DOWN_ARROW_ICON");
-
-    /**
-     * Closed group icon.
-     */
-    public static final ImageID RIGHT_ARROW_ICON
-        = new ImageID("service.gui.icons.RIGHT_ARROW_ICON");
 
     /**
      * The call button image.
@@ -1417,13 +1411,17 @@ public class ImageLoader
         OperationSetPresence presence
             = pps.getOperationSet(OperationSetPresence.class);
 
-        Image statusImage;
+        PresenceStatus status = null;
         byte[] protocolStatusIcon = null;
+        Image statusImage;
 
         if(presence != null)
-            protocolStatusIcon = presence.getPresenceStatus().getStatusIcon();
+             status = presence.getPresenceStatus();
+        
+        if(presence != null && status != null)
+            protocolStatusIcon = status.getStatusIcon();
 
-        if (presence != null && protocolStatusIcon != null)
+        if (presence != null && status != null && protocolStatusIcon != null)
         {
             statusImage = ImageUtils.getBytesInImage(protocolStatusIcon);
         }

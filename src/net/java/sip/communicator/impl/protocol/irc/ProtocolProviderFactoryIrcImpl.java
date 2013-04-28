@@ -9,6 +9,7 @@ package net.java.sip.communicator.impl.protocol.irc;
 import java.util.*;
 
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.*;
 
 import org.osgi.framework.*;
 
@@ -22,9 +23,22 @@ import org.osgi.framework.*;
 public class ProtocolProviderFactoryIrcImpl
     extends ProtocolProviderFactory
 {
+    private static final Logger logger
+        = Logger.getLogger(ProtocolProviderFactoryIrcImpl.class);
+
     public ProtocolProviderFactoryIrcImpl()
     {
         super(IrcActivator.bundleContext, ProtocolNames.IRC);
+    }
+
+    /**
+     * Ovverides the original in order give access to protocol implementation.
+     *
+     * @param accountID the account identifier.
+     */
+    protected void storeAccount(AccountID accountID)
+    {
+        super.storeAccount(accountID);
     }
 
     /**
@@ -75,6 +89,13 @@ public class ProtocolProviderFactoryIrcImpl
         return accountID;
     }
 
+    /**
+     * Create an account.
+     *
+     * @param userID the user ID
+     * @param accountProperties the properties associated with the user ID
+     * @return new <tt>AccountID</tt>
+     */
     protected AccountID createAccountID(
         String userID,
         Map<String, String> accountProperties)
@@ -95,6 +116,6 @@ public class ProtocolProviderFactoryIrcImpl
     public void modifyAccount(  ProtocolProviderService protocolProvider,
                                 Map<String, String> accountProperties)
     {
-        // TODO Auto-generated method stub
+        logger.fatal("TODO Auto-generated method stub");
     }
 }

@@ -25,8 +25,15 @@ import org.osgi.framework.*;
 public class IrcActivator
     implements BundleActivator
 {
-    private static final Logger logger
-        = Logger.getLogger(IrcActivator.class);
+    /**
+     * Service reference for the currently valid IRC provider factory.
+     */
+    private ServiceRegistration ircPpFactoryServReg = null;
+
+    /**
+     * The currently valid bundle context.
+     */
+    public static BundleContext bundleContext = null;
 
     /**
      * A reference to the IRC protocol provider factory.
@@ -35,11 +42,13 @@ public class IrcActivator
                                     ircProviderFactory = null;
 
     /**
-     * The currently valid bundle context.
+     * A reference to the currently valid <tt>ResoucreManagementService</tt>
+     * instance.
      */
-    public static BundleContext bundleContext = null;
+    private static ResourceManagementService resourcesService = null;
 
-    private static ResourceManagementService resourceService;
+    private static final Logger logger
+        = Logger.getLogger(IrcActivator.class);
 
     /**
      * Called when this bundle is started. In here we'll export the
@@ -63,7 +72,7 @@ public class IrcActivator
         ircProviderFactory = new ProtocolProviderFactoryIrcImpl();
 
         //Register the IRC provider factory.
-        context.registerService(
+        ircPpFactoryServReg = context.registerService(
                     ProtocolProviderFactory.class.getName(),
                     ircProviderFactory,
                     hashtable);
@@ -107,9 +116,9 @@ public class IrcActivator
      */
     public static ResourceManagementService getResources()
     {
-        if (resourceService == null)
-            resourceService
+        if (resourcesService == null)
+            resourcesService
                 = ResourceManagementServiceUtils.getService(bundleContext);
-        return resourceService;
+        return resourcesService;
     }
 }

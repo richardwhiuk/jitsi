@@ -40,8 +40,18 @@ public class ProtocolProviderServiceIrcImpl
     /**
      * The operation set managing multi user chat.
      */
+    private OperationSetBasicInstantMessagingIrcImpl basicChat;
+    
+    /**
+     * The operation set managing multi user chat.
+     */
     private OperationSetMultiUserChatIrcImpl multiUserChat;
 
+    /**
+     * The operation set managing presence
+     */
+    private OperationSetPresenceIrcImpl presence;
+    
     /**
      * Indicates whether or not the provider is initialized and ready for use.
      */
@@ -86,22 +96,34 @@ public class ProtocolProviderServiceIrcImpl
         {
             this.accountID = accountID;
 
+            //Initialize the single user chat support
+            basicChat = new OperationSetBasicInstantMessagingIrcImpl(this);
+            
+            addSupportedOperationSet(
+                OperationSetBasicInstantMessaging.class,
+                basicChat);
+            
             //Initialize the multi user chat support
             multiUserChat = new OperationSetMultiUserChatIrcImpl(this);
 
             addSupportedOperationSet(
                 OperationSetMultiUserChat.class,
                 multiUserChat);
+            
+            //Initialize the presence/contact support
+            presence = new OperationSetPresenceIrcImpl(this);
+            addSupportedOperationSet(
+                OperationSetPresence.class,
+                presence);
+            addSupportedOperationSet(
+                OperationSetPersistentPresence.class,
+                presence);
 
-            userID = getAccountID().getUserID();
+            IrcAccountID ircID = (IrcAccountID) accountID;
 
-            ircStack
-                = new IrcStack(
-                        this,
-                        userID,
-                        userID,
-                        "SIP Communicator 1.0",
-                        "");
+            ircStack = new IrcStack(this, ircID, accountID
+                .getAccountPropertyString(
+                    ProtocolProviderFactory.SERVER_ADDRESS));
 
             isInitialized = true;
         }
@@ -172,12 +194,12 @@ public class ProtocolProviderServiceIrcImpl
         boolean autoNickChange =
             accountID.getAccountPropertyBoolean(
                 ProtocolProviderFactory.AUTO_CHANGE_USER_NAME, true);
-        boolean passwordRequired =
+        boolean noPasswordRequired =
             accountID.getAccountPropertyBoolean(
                 ProtocolProviderFactory.NO_PASSWORD_REQUIRED, true);
             
         //if we don't - retrieve it from the user through the security authority
-        if (serverPassword == null && passwordRequired)
+        if (serverPassword == null && !noPasswordRequired)
         {
             //create a default credentials object
             UserCredentials credentials = new UserCredentials();

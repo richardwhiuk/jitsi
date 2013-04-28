@@ -13,7 +13,6 @@ import java.util.*;
 import javax.swing.*;
 
 import net.java.sip.communicator.impl.osdependent.*;
-import net.java.sip.communicator.plugin.desktoputil.presence.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 
@@ -83,7 +82,7 @@ public class StatusSelector
         Iterator<PresenceStatus> statusIterator
             = this.presence.getSupportedStatusSet();
 
-        while (statusIterator.hasNext())
+        while (statusIterator != null && statusIterator.hasNext())
         {
             PresenceStatus status = statusIterator.next();
 
