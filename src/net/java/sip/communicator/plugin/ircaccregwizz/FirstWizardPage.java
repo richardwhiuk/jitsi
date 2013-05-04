@@ -473,6 +473,7 @@ public class FirstWizardPage
             rememberPassBox.setEnabled(true);
         }
 
+        this.setNextButtonAccordingToUserID();
     }
 
     public void changedUpdate(DocumentEvent event){}
