@@ -68,13 +68,13 @@ public class FirstWizardPage
         = new JLabel(Resources.getString("plugin.ircaccregwizz.USERNAME"));
 
     private JLabel passLabel
-        = new JLabel(Resources.getString("service.gui.PASSWORD"));
+        = new JLabel(Resources.getString("service.gui.PASSWORD") + ":");
 
     private JLabel server
         = new JLabel(Resources.getString("plugin.ircaccregwizz.HOST"));
 
     private JLabel port
-        = new JLabel(Resources.getString("service.gui.PORT" + ":"));
+        = new JLabel(Resources.getString("service.gui.PORT") + ":");
 
     private JPanel emptyPanel = new TransparentPanel();
 
